@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import authRouter from "./routes/authRouter.js";
+import bookRouter from "./routes/bookRouter.js";
+import authCheck from "./middleware/authMiddelware.js";
 
 const app = express();
 
@@ -29,3 +31,4 @@ app.use(cookieParser());
 
 //auth routes
 app.use("/", authRouter);
+app.use("/", authCheck, bookRouter);

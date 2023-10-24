@@ -3,17 +3,20 @@ import jwt from "jsonwebtoken";
 const authCheck = (req, res, next) => {
   const token = req.cookies.jwt;
   if (token) {
-    jwt.verify(token, "moAminSecretKey", (err, decodedToken) => {
+    jwt.verify(token, process.env.SECRET_KEY, (err, decodedToken) => {
       if (err) {
         console.log(err.message);
-        res.redirect("/login");
+        res.json("authorization error please try to log in again");
       } else {
-        // console.log(decodedToken);
-        next()
+        const userId = decodedToken.id;
+        const type = decodedToken.type;
+        req.userId = userId;
+        req.type = type;
+        next();
       }
     });
   } else {
-    res.redirect("/login");
+    res.json("authorization error please try to log in again");
   }
 };
 
