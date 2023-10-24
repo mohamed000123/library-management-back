@@ -66,3 +66,25 @@ export function search(req, res) {
       res.status(500).json({ error: err });
     });
 }
+
+export function reserve(req, res) {
+  const userType = req.type
+  console.log(userType);
+  const userId = req.userId;
+  const bookISBN = req.params.ISBN;
+  Book.findOne({ ISBN: bookISBN }).then((book) => {
+    const availableCopiesNumber = book.availableCopies;
+    availableCopiesNumber > 0
+      ? Book.findOneAndUpdate(
+          { ISBN: bookISBN },
+          { borrowedBy: userId, $inc: { availableCopies: -1 } }
+        )
+          .then((data) => {
+            res.status(200).json("book reserved successfully");
+          })
+          .catch((err) => {
+            res.json(err);
+          })
+      : res.status(200).json("sorry this book is not available right now");
+  });
+}

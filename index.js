@@ -31,4 +31,5 @@ app.use(cookieParser());
 
 //auth routes
 app.use("/", authRouter);
+//book routes
 app.use("/", authCheck, bookRouter);

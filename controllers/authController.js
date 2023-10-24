@@ -1,17 +1,16 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { v4 as uuidv4 } from "uuid";
 import dotenv from "dotenv";
 import User from "../models/user.js";
 
 dotenv.config();
-function createToken(id, type) {
-  return jwt.sign({ id, type }, process.env.SECRET_KEY, { expiresIn: 3600 });
+function createToken(id) {
+  return jwt.sign({ id }, process.env.SECRET_KEY, { expiresIn: 3600 });
 }
 
-export async function signup(req, res) {
+export function signup(req, res) {
   let newUser = new User(req.body);
-  newUser.ISBN = uuidv4();
+  newUser.role = "user";
   newUser
     .save()
     .then(() => {
@@ -72,4 +71,17 @@ export const logout = (req, res) => {
     secure: true,
   });
   res.send("Logged out successfully");
+};
+
+export const createAdmin = (req, res) => {
+  let newUser = new User(req.body);
+  newUser.role = "admin";
+  newUser
+    .save()
+    .then(() => {
+      res.status(200).json("admin account is created successfully");
+    })
+    .catch((er) => {
+      res.status(500).json(`creating account error: ${er}`);
+    });
 };

@@ -15,6 +15,11 @@ const userSchema = new Schema({
     required: true,
     minlength: [6, "minimum password length is 6 char"],
   },
+  role: {
+    type: String,
+    required: true,
+    enum: ["user", "admin"],
+  },
 });
 userSchema.pre("save", async function (next) {
   const salt = await bcrypt.genSalt();
