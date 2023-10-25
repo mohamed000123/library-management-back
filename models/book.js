@@ -25,6 +25,10 @@ const bookSchema = new Schema(
       type: Number,
       required: true,
     },
+    addedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+    },
     borrowedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",

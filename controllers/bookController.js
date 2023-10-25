@@ -2,12 +2,14 @@ import Book from "./../models/book.js";
 import { v4 as uuidv4 } from "uuid";
 export function addBook(req, res) {
   const { title, author, description, availableCopies } = req.body;
+  const addedBy = req.userId;
   const newBook = {
     ISBN: uuidv4(),
     title,
     author,
     description,
     availableCopies,
+    addedBy,
   };
   Book.create(newBook)
     .then(() => {
@@ -22,7 +24,15 @@ export function addBook(req, res) {
 }
 
 export function allBooks(req, res) {
-  Book.find().then((data) => {
+  const userId = req.userId;
+  Book.find({ addedBy: { $not: { $eq: userId } } }).then((data) => {
+    res.json(data);
+  });
+}
+
+export function userBooks(req, res) {
+  const userId = req.userId;
+  Book.find({ addedBy: userId }).then((data) => {
     res.json(data);
   });
 }
@@ -68,7 +78,7 @@ export function search(req, res) {
 }
 
 export function reserve(req, res) {
-  const userType = req.type
+  const userType = req.type;
   console.log(userType);
   const userId = req.userId;
   const bookISBN = req.params.ISBN;
