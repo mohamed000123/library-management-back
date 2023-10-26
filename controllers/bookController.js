@@ -1,5 +1,6 @@
 import Book from "./../models/book.js";
 import { v4 as uuidv4 } from "uuid";
+
 export function addBook(req, res) {
   const { title, author, description, availableCopies } = req.body;
   const addedBy = req.userId;
@@ -25,7 +26,10 @@ export function addBook(req, res) {
 
 export function allBooks(req, res) {
   const userId = req.userId;
-  Book.find({ addedBy: { $not: { $eq: userId } } }).then((data) => {
+  Book.find({
+    addedBy: { $not: { $eq: userId } },
+    borrowedBy: { $not: { $eq: userId } },
+  }).then((data) => {
     res.json(data);
   });
 }
@@ -50,7 +54,19 @@ export function deleteBook(req, res) {
 export function editBook(req, res) {
   Book.findOneAndUpdate({ ISBN: req.params.ISBN }, req.body)
     .then((data) => {
-      res.status(200).json("book updated successfully");
+      res
+        .status(200)
+        .json({ message: "book updated successfully", success: "true" });
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+}
+
+export function getBook(req, res) {
+  Book.findOne({ ISBN: req.params.ISBN })
+    .then((data) => {
+      res.status(200).json(data);
     })
     .catch((err) => {
       res.json(err);
@@ -78,8 +94,6 @@ export function search(req, res) {
 }
 
 export function reserve(req, res) {
-  const userType = req.type;
-  console.log(userType);
   const userId = req.userId;
   const bookISBN = req.params.ISBN;
   Book.findOne({ ISBN: bookISBN }).then((book) => {
@@ -97,4 +111,15 @@ export function reserve(req, res) {
           })
       : res.status(200).json("sorry this book is not available right now");
   });
+}
+
+export function reservedBooks(req, res) {
+  const userId = req.userId;
+  Book.find({ borrowedBy: userId })
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
 }
