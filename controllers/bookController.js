@@ -11,6 +11,7 @@ export function addBook(req, res) {
     description,
     availableCopies,
     addedBy,
+    status: "pending",
   };
   Book.create(newBook)
     .then(() => {
@@ -20,18 +21,45 @@ export function addBook(req, res) {
     })
     .catch((e) => {
       console.log(e);
-      res.status(500).json(e);
+      let message = e.message;
+      message.includes("availableCopies")
+        ? (message = "number of copies must be a number")
+        : (message = "minimum allowable input characters length is 4");
+
+      res.status(400).json({ message });
     });
 }
 
 export function allBooks(req, res) {
   const userId = req.userId;
   Book.find({
-    addedBy: { $not: { $eq: userId } },
-    borrowedBy: { $not: { $eq: userId } },
-  }).then((data) => {
-    res.json(data);
-  });
+    $and: [
+      { addedBy: { $not: { $eq: userId } } },
+      { borrowedBy: { $not: { $eq: userId } } },
+      { status: { $not: { $eq: "pending" } } },
+      { availableCopies: { $not: { $eq: 0 } } },
+    ],
+  })
+    .then((data) => {
+      res.json(data);
+    })
+    .catch((e) => {
+      console.log(e);
+      res.json(e);
+    });
+}
+
+export function pinnedBooks(req, res) {
+  Book.find({
+    status: "pending",
+  })
+    .then((data) => {
+      res.json(data);
+    })
+    .catch((e) => {
+      console.log(e);
+      res.json(e);
+    });
 }
 
 export function userBooks(req, res) {
@@ -118,6 +146,18 @@ export function reservedBooks(req, res) {
   Book.find({ borrowedBy: userId })
     .then((data) => {
       res.status(200).json(data);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+}
+
+export function approveBook(req, res) {
+  Book.findOneAndUpdate({ ISBN: req.params.ISBN }, { status: "aproved" })
+    .then((data) => {
+      res
+        .status(200)
+        .json({ message: "book approved successfully", success: "true" });
     })
     .catch((err) => {
       res.json(err);

@@ -9,6 +9,8 @@ import {
   userBooks,
   reservedBooks,
   getBook,
+  pinnedBooks,
+  approveBook,
 } from "../controllers/bookController.js";
 
 const router = express.Router();
@@ -22,4 +24,6 @@ router.put("/book/:ISBN", editBook);
 router.post("/search", search);
 router.post("/reserve/:ISBN", reserve);
 router.get("/user-reserved-books", reservedBooks);
+router.get("/pinned", pinnedBooks);
+router.get("/approve/:ISBN", approveBook);
 export default router;

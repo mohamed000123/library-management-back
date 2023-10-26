@@ -44,7 +44,7 @@ export const login = (req, res) => {
               maxAge: 1000 * 3600,
               secure: true,
             });
-            res.status(201).json({ user: user._id });
+            res.status(201).json({ user: user._id, role: user.role });
           } else {
             res.status(500).json({ message: "incorrect password" });
           }
@@ -59,14 +59,7 @@ export const login = (req, res) => {
 };
 
 export const logout = (req, res) => {
-  // res.cookie("jwt", "", {
-  //   maxAge: 1,
-  //   sameSite: "none",
-  //   secure: true,
-  // });
-  // res.json("logged out successfully");
   res.clearCookie("jwt", {
-    maxAge: 1,
     sameSite: "none",
     secure: true,
   });
