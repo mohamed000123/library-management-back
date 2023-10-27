@@ -30,7 +30,7 @@ export function addBook(req, res) {
     });
 }
 
-export function allBooks(req, res) {
+export function availableBooks(req, res) {
   const userId = req.userId;
   Book.find({
     $and: [
@@ -101,26 +101,6 @@ export function getBook(req, res) {
     });
 }
 
-export function search(req, res) {
-  const query = req.body.query;
-  Book.find({
-    $or: [
-      { ISBN: query },
-      { title: { $regex: query, $options: "i" } },
-      {
-        author: { $regex: query, $options: "i" },
-      },
-    ],
-  })
-    .then((data) => {
-      res.status(200).json(data);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ error: err });
-    });
-}
-
 export function reserve(req, res) {
   const userId = req.userId;
   const bookISBN = req.params.ISBN;
@@ -161,5 +141,30 @@ export function approveBook(req, res) {
     })
     .catch((err) => {
       res.json(err);
+    });
+}
+
+export function bookSearch(req, res) {
+  const keyword = req.params.keyword;
+  const userId = req.userId;
+  Book.find({
+    $and: [
+      { addedBy: { $not: { $eq: userId } } },
+      { borrowedBy: { $not: { $eq: userId } } },
+      { status: { $not: { $eq: "pending" } } },
+      { availableCopies: { $not: { $eq: 0 } } },
+    ],
+    $or: [
+      { title: { $regex: keyword, $options: "i" } },
+      { description: { $regex: keyword, $options: "i" } },
+      { author: { $regex: keyword, $options: "i" } },
+    ],
+  })
+    .then((result) => {
+      res.json(result);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: "Server error" });
     });
 }
