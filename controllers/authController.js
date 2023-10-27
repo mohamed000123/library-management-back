@@ -44,9 +44,13 @@ export const login = (req, res) => {
               maxAge: 1000 * 3600,
               secure: true,
             });
-            res.status(201).json({ user: user._id, role: user.role });
+            res.status(201).json({
+              user: user._id,
+              role: user.role,
+              message: "Login successful",
+            });
           } else {
-            res.status(500).json({ message: "incorrect password" });
+            res.status(401).json({ message: "incorrect password" });
           }
         });
       } else {
@@ -75,6 +79,6 @@ export const createAdmin = (req, res) => {
       res.status(200).json("admin account is created successfully");
     })
     .catch((er) => {
-      res.status(500).json(`creating account error: ${er}`);
+      res.status(401).json(`creating account error: ${er}`);
     });
 };

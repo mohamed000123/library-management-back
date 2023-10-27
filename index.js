@@ -5,8 +5,7 @@ import cors from "cors";
 import authRouter from "./routes/authRouter.js";
 import bookRouter from "./routes/bookRouter.js";
 import authCheck from "./middleware/authMiddelware.js";
-
-const app = express();
+export const app = express();
 
 mongoose
   .connect(process.env.DB_URL)
